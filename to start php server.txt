@@ -1,0 +1,15 @@
+
+php -S localhost:8000
+
+http://localhost:8000/portfolio index.html
+
+http://localhost:8000/index.html
+
+
+Professional Summary
+
+Results-driven Cloud & DevOps Engineer with strong experience in AWS infrastructure, Terraform automation, and technical case resolution. 
+Skilled at investigating complex system issues, ensuring SLA compliance, and driving end-to-end resolution across development, QA, and support teams.
+ Adept at mentoring junior engineers, improving workflow efficiency, and implementing best-practice DevOps processes to deliver a seamless customer experience. 
+Passionate about cross-functional collaboration, data-driven decision making, and continuous improvement in global software delivery environments.
+
