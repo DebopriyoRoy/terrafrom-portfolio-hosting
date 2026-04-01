@@ -57,10 +57,11 @@ kind: Service
 metadata:
   name: portfolio-service
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: portfolio
   ports:
   - protocol: TCP
     port: 80
     targetPort: 80
+    nodePort: 30082
