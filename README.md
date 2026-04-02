@@ -464,13 +464,6 @@ kubectl rollout restart deployment/portfolio-deployment
 # Check nginx proxy
 sudo systemctl status nginx
 ```
-
----
-
-## Resume Statement
-
-> Designed and deployed a production-grade two-phase CI/CD pipeline: provisioned AWS infrastructure (VPC with public/private subnets, NAT Gateway, EC2, S3, IAM) via parameterized Terraform pipeline in Jenkins, then automated code quality analysis (SonarQube), artifact management (Nexus), multi-platform Docker image builds (Buildx + QEMU for linux/amd64 & linux/arm64), and zero-downtime rolling deployments to a private-subnet AWS EKS cluster (Auto Mode, K8s 1.35) — achieving full Git-to-production automation in under 3 minutes per build.
-
 ---
 
 ## Author
