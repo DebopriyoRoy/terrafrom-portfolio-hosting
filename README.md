@@ -9,6 +9,22 @@
 ![AWS](https://img.shields.io/badge/AWS-FF9900?style=flat&logo=amazon-aws&logoColor=white)
 ![SonarQube](https://img.shields.io/badge/SonarQube-4E9BCD?style=flat&logo=sonarqube&logoColor=white)
 ![Nexus](https://img.shields.io/badge/Nexus-Repository-1B1C30?style=flat&logo=sonatype&logoColor=white)
+
+---
+
+## Configuration
+
+Before deploying, replace the following placeholders with your actual values:
+
+| Placeholder | Description | Example |
+|-------------|-------------|---------|
+| `<JENKINS_EC2_PUBLIC_IP>` | Elastic IP of your Jenkins EC2 instance | Your EC2 public IP |
+| `<JENKINS_EC2_PRIVATE_IP>` | Private IP of Jenkins EC2 within the VPC | Typically `10.0.x.x` |
+| `<EKS_NODE_PRIVATE_IP>` | Private IP of the EKS worker node | Typically `10.0.x.x` |
+| `<VPC_CIDR>` | CIDR block of your VPC | e.g. `10.0.0.0/16` |
+
+> **Security note:** Never commit real IP addresses to a public repository. Use environment variables or parameter stores for sensitive infrastructure details.
+
 ---
 
 ## Architecture Diagram
@@ -30,9 +46,9 @@ This project demonstrates a **production-grade, fully automated DevOps workflow*
 
 **Live traffic flow:**
 ```
-Browser → 34.196.80.40:30082 (Jenkins EC2, public subnet)
+Browser → <JENKINS_EC2_PUBLIC_IP>:30082 (Jenkins EC2, public subnet)
               ↓ nginx reverse proxy
-         10.0.152.183:30082  (EKS node, private subnet — no public IP)
+         <EKS_NODE_PRIVATE_IP>:30082  (EKS node, private subnet — no public IP)
               ↓
          PHP portfolio pod → port 80
 ```
@@ -81,7 +97,7 @@ terrafrom-portfolio-hosting/
 
 | Module | Resource | Name |
 |--------|----------|------|
-| VPC | VPC | ci-cd-vpc (10.0.0.0/16) |
+| VPC | VPC | ci-cd-vpc (<VPC_CIDR>) |
 | VPC | Public Subnets (×2) | ci-cd-subnet-public1/2-us-east-1a/b |
 | VPC | Private Subnets (×2) | ci-cd-subnet-private1/2-us-east-1a/b |
 | VPC | Internet Gateway | ci-cd-igw |
@@ -163,7 +179,7 @@ Stage 4 · Nexus Package Artifact
      │    zip -r portfolio-hosting-${BUILD_NUMBER}.zip
      ▼
 Stage 5 · Upload to Nexus
-     │    curl PUT → http://10.0.2.194:8081/repository/php-artifacts/
+     │    curl PUT → http://<JENKINS_EC2_PRIVATE_IP>:8081/repository/php-artifacts/
      ▼
 Stage 6 · DockerHub Login
      │    docker login --password-stdin
@@ -194,8 +210,8 @@ pipeline {
         awscred       = credentials('aws-key')
         SONAR_TOKEN   = credentials('sonarqube-key')
         NEXUS_CREDS   = credentials('nexus-key')
-        SONAR_URL     = 'http://10.0.2.194:9000'
-        NEXUS_URL     = 'http://10.0.2.194:8081'
+        SONAR_URL     = 'http://<JENKINS_EC2_PRIVATE_IP>:9000'
+        NEXUS_URL     = 'http://<JENKINS_EC2_PRIVATE_IP>:8081'
         ARTIFACT_NAME = "portfolio-hosting-${BUILD_NUMBER}.zip"
     }
     stages {
@@ -366,7 +382,7 @@ spec:
 
 ## Jenkins Toolchain Setup
 
-All three tools run as Docker containers on the Jenkins EC2 (`10.0.2.194`):
+All three tools run as Docker containers on the Jenkins EC2 (`<JENKINS_EC2_PRIVATE_IP>`):
 
 | Tool | Image | Port | Purpose |
 |------|-------|------|---------|
@@ -428,7 +444,7 @@ sudo tee /etc/nginx/conf.d/portfolio.conf > /dev/null <<'EOF'
 server {
     listen 30082;
     location / {
-        proxy_pass http://10.0.152.183:30082;
+        proxy_pass http://<EKS_NODE_PRIVATE_IP>:30082;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
     }
